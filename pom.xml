@@ -129,6 +129,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
     <shell-executable>bash</shell-executable>
 
     <leveldbjni.group>org.fusesource.leveldbjni</leveldbjni.group>
+    <sonar.organization>vikrant1717</sonar.organization>
   </properties>
 
   <modules>
