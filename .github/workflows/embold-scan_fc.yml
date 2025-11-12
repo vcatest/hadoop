@@ -28,8 +28,14 @@ jobs:
           distribution: 'temurin'
 
       # Step 3: Build the project and run SpotBugs
+      # FIX: The build fails in module 'hadoop-yarn-applications-catalog-webapp' due to a 'yarn install' error.
+      # We skip this module's execution (-pl) to allow the rest of the project to build for analysis.
       - name: Build with Maven and Run Analysis
-        run: mvn -B clean verify -DskipTests
+        run: |
+          mvn -B clean verify -DskipTests -pl '!hadoop-yarn-applications-catalog-webapp'
+          
+      # Alternative fix (if yarn issue is system-wide or to avoid frontend-maven-plugin entirely):
+      # run: mvn -B clean verify -DskipTests -Dfrontend.skip=true
 
       # Step 4: Download and extract the Embold scanner
       - name: Download and Extract Scanner
