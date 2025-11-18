@@ -1,4 +1,3 @@
-## Updated .github/workflows/embold-scan_fc.yml
 name: Embold Code Quality Scan
 
 on:
@@ -6,7 +5,7 @@ on:
     branches: [ trunk ]
   pull_request:
     branches: [ trunk ]
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   embold-scan_fc:
@@ -26,22 +25,21 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # NEW: Set up Node.js environment (Best practice, though we are skipping the frontend build)
+      # NEW: Set up Node.js environment (included for completeness, though frontend is skipped)
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18' # Use a recent LTS version
 
       # Step 3: Build the project and run SpotBugs
-      # FIX: The build failed due to 'yarn install'. We skip the frontend-maven-plugin globally.
+      # FIX: Skips the frontend-maven-plugin using -Dfrontend.skip=true to resolve the 'yarn install' error.
       - name: Build with Maven and Run Analysis (Skip Frontend)
         run: |
           mvn -B clean verify -DskipTests -Dfrontend.skip=true
-      
+
       # Step 4: Download and extract the Embold scanner
       - name: Download and Extract Scanner
         run: |
-          # Use wget as an alternative to curl if needed, but curl is fine here
           curl -sS https://v1.embold.io/nfs/CLI/browserstack-codequality-scanner.tar.gz -o browserstack-codequality-scanner-archive.tar.gz
           tar xvf browserstack-codequality-scanner-archive.tar.gz
 
