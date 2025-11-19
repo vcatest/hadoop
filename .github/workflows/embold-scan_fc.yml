@@ -25,7 +25,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # NEW: Set up Node.js environment (included for completeness, though frontend is skipped)
+      # NEW: Set up Node.js environment 
+      # While frontend is skipped, including this helps if 'yarn' is implicitly used elsewhere.
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
