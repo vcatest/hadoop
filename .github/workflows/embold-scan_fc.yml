@@ -1,5 +1,6 @@
 name: Embold Code Quality Scan
 
+# Triggers the workflow on pushes, pull requests to the 'trunk' branch, and manually.
 on:
   push:
     branches: [ trunk ]
@@ -9,51 +10,56 @@ on:
 
 jobs:
   embold-scan_fc:
+    # Use a standard Ubuntu runner
     runs-on: ubuntu-latest
+    
+    # Optional: Increase the timeout if the scan is expected to take a long time (e.g., 90 minutes)
+    # timeout-minutes: 90 
 
     steps:
       # Step 1: Check out your repository code
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Full history is required for accurate SCM analysis
 
-      # Step 2: Set up the Java environment
+      # Step 2: Set up the Java environment (required for Maven build)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # NEW: Set up Node.js environment 
-      # While frontend is skipped, including this helps if 'yarn' is implicitly used elsewhere.
+      # Step 3: Set up Node.js environment (Good practice, even if frontend is skipped, as other build dependencies might use it)
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18' # Use a recent LTS version
 
-      # Step 3: Build the project and run SpotBugs
-      # FIX: Skips the frontend-maven-plugin using -Dfrontend.skip=true to resolve the 'yarn install' error.
+      # Step 4: Build the project and run pre-scan analysis
+      # FIX: Skips the frontend-maven-plugin using -Dfrontend.skip=true to avoid the 'yarn install' error.
       - name: Build with Maven and Run Analysis (Skip Frontend)
         run: |
           mvn -B clean verify -DskipTests -Dfrontend.skip=true
 
-      # Step 4: Download and extract the Embold scanner
+      # Step 5: Download and extract the Embold scanner CLI
       - name: Download and Extract Scanner
         run: |
           curl -sS https://v1.embold.io/nfs/CLI/browserstack-codequality-scanner.tar.gz -o browserstack-codequality-scanner-archive.tar.gz
           tar xvf browserstack-codequality-scanner-archive.tar.gz
 
-      # Step 5: Download the repository configuration file
+      # Step 6: Download the repository configuration file from Embold server
       - name: Download Repository Configuration
+        # The URL and UID are hardcoded, but the token uses a GitHub Secret
         run: |
           curl --silent --location --request GET \
             "http://18.184.13.138:3089/api/v1/repositories/acc2ab8ea83e2adc72ea8c060fb8cdfb/scans/config/download" \
             --header "Authorization: Bearer ${{ secrets.EMBOLD_SCAN_TOKEN_FC }}" \
             -o repository-configuration.json
 
-      # Step 6: Run the Embold analysis scanner
+      # Step 7: Run the Embold analysis scanner
       - name: Run Embold Scanner
+        # Set the token as an environment variable for the scanner command
         env:
           EMBOLD_TOKEN: ${{ secrets.EMBOLD_SCAN_TOKEN_FC }}
         run: |
