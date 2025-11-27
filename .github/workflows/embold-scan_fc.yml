@@ -47,24 +47,24 @@ jobs:
       # Step 5: Download and extract the Embold scanner CLI
       - name: Download and Extract Scanner
         run: |
-          curl -sS https://v1.embold.io/nfs/CLI/browserstack-codequality-scanner.tar.gz -o browserstack-codequality-scanner-archive.tar.gz
+          curl -sS ${{ vars.EMBOLD_SCANNER_URL }} -o browserstack-codequality-scanner-archive.tar.gz
           tar xvf browserstack-codequality-scanner-archive.tar.gz
 
       # Step 6: Download the repository configuration file from Embold server
       - name: Download Repository Configuration
         run: |
           curl --silent --location --request GET \
-            "http://18.184.13.138:3089/api/v1/repositories/acc2ab8ea83e2adc72ea8c060fb8cdfb/scans/config/download" \
-            --header "Authorization: Bearer ${{ secrets.EMBOLD_SCAN_TOKEN_FC }}" \
+            "${{ vars.EMBOLD_URL_JAVA }}/api/v1/repositories/acc2ab8ea83e2adc72ea8c060fb8cdfb/scans/config/download" \
+            --header "Authorization: Bearer ${{ secrets.EMBOLD_TOKEN_JAVA }}" \
             -o repository-configuration.json
 
       # Step 7: Run the Embold analysis scanner
       - name: Run Embold Scanner
         run: |
           # Set the token as a local environment variable for the scanner command
-          EMBOLD_TOKEN=${{ secrets.EMBOLD_SCAN_TOKEN_FC }} \
+          EMBOLD_TOKEN=${{ secrets.EMBOLD_TOKEN_JAVA }} \
           ./browserstack-codequality-scanner/bin/embold-scanner analyse \
-            -u http://18.184.13.138:3089 \
+            -u ${{ vars.EMBOLD_URL_JAVA }} \
             -t $EMBOLD_TOKEN \
             -r acc2ab8ea83e2adc72ea8c060fb8cdfb \
             -b . \
