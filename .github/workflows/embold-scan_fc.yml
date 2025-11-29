@@ -2,13 +2,11 @@ name: Embold Code Quality Scan
 
 # Triggers the workflow on pushes, pull requests to the 'trunk' branch, and manually.
 on:
-  push:
-    branches:
-      - trunk
-  pull_request:
-    branches:
-      - trunk
-  workflow_dispatch:
+  push:
+    branches: [ trunk ]
+  pull_request:
+    branches: [ trunk ]
+  workflow_dispatch:
 
 jobs:
   embold-scan_fc:
