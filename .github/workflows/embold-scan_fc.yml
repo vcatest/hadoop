@@ -9,12 +9,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  embold-scan_fc:
-    # Use a standard Ubuntu runner
-    runs-on: ubuntu-latest
-    
-    # Optional: Increase the timeout if the scan is expected to take a long time (e.g., 90 minutes)
-    # timeout-minutes: 90 
+  embold-scan_fc:
+    # Use a standard Ubuntu runner
+    runs-on: ubuntu-latest
+    
+    # Optional: Increase the timeout if the scan is expected to take a long time (e.g., 90 minutes)
+    # timeout-minutes: 90 
 
     steps:
       # Step 1: Check out your repository code
