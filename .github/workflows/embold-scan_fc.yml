@@ -1,73 +1,59 @@
 name: Embold Code Quality Scan
 
-# Triggers the workflow on pushes, pull requests to the 'trunk' branch, and manually.
 on:
   push:
-    branches: [ trunk ]
+    branches: [ "trunk" ]
   pull_request:
-    branches: [ trunk ]
+    branches: [ "trunk" ]
   workflow_dispatch:
 
 jobs:
   embold-scan_fc:
-    # Use a standard Ubuntu runner
     runs-on: ubuntu-latest
-    
-    # Optional: Increase the timeout if the scan is expected to take a long time (e.g., 90 minutes)
-    # timeout-minutes: 90 
 
-    steps:
-      # Step 1: Check out your repository code
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Full history is required for accurate SCM analysis
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # Step 2: Set up the Java environment (required for Maven build)
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-      # Step 3: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18' # Use a recent LTS version
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-      # Step 4: Build the project and run pre-scan analysis, skipping the problematic frontend build
-      - name: Build with Maven (Skip Frontend and Tests)
-        run: |
-          # The -Dfrontend.skip=true flag fixes the 'yarn install' error
-          mvn -B clean install -DskipTests -Dfrontend.skip=true
+      - name: Build with Maven (Skip Frontend and Tests)
+        run: |
+          mvn -B clean install -DskipTests -Dfrontend.skip=true
 
-      # Step 5: Download and extract the Embold scanner CLI
-      - name: Download and Extract Scanner
-        run: |
-          curl -sS ${{ vars.EMBOLD_SCANNER_URL }} -o browserstack-codequality-scanner-archive.tar.gz
-          tar xvf browserstack-codequality-scanner-archive.tar.gz
+      - name: Download and Extract Scanner
+        run: |
+          curl -sS ${{ vars.EMBOLD_SCANNER_URL }} -o browserstack-codequality-scanner-archive.tar.gz
+          tar xvf browserstack-codequality-scanner-archive.tar.gz
 
-      # Step 6: Download the repository configuration file from Embold server
-      - name: Download Repository Configuration
-        run: |
-          curl --silent --location --request GET \
-            "${{ vars.EMBOLD_URL_JAVA }}/api/v1/repositories/acc2ab8ea83e2adc72ea8c060fb8cdfb/scans/config/download" \
-            --header "Authorization: Bearer ${{ secrets.EMBOLD_TOKEN_JAVA }}" \
-            -o repository-configuration.json
+      - name: Download Repository Configuration
+        run: |
+          curl --silent --location --request GET \
+            "${{ vars.EMBOLD_URL_JAVA }}/api/v1/repositories/acc2ab8ea83e2adc72ea8c060fb8cdfb/scans/config/download" \
+            --header "Authorization: Bearer ${{ secrets.EMBOLD_TOKEN_JAVA }}" \
+            -o repository-configuration.json
 
-      # Step 7: Run the Embold analysis scanner
-      - name: Run Embold Scanner
-        run: |
-          # Set the token as a local environment variable for the scanner command
-          EMBOLD_TOKEN=${{ secrets.EMBOLD_TOKEN_JAVA }} \
-          ./browserstack-codequality-scanner/bin/embold-scanner analyse \
-            -u ${{ vars.EMBOLD_URL_JAVA }} \
-            -t $EMBOLD_TOKEN \
-            -r acc2ab8ea83e2adc72ea8c060fb8cdfb \
-            -b . \
-            -d ./embold-data \
-            -c ./repository-configuration.json \
-            -l ./embold-log \
-            -sh ./embold-scanner-home \
-            -v
+      - name: Run Embold Scanner
+        run: |
+          EMBOLD_TOKEN=${{ secrets.EMBOLD_TOKEN_JAVA }} \
+          ./browserstack-codequality-scanner/bin/embold-scanner analyse \
+            -u ${{ vars.EMBOLD_URL_JAVA }} \
+            -t $EMBOLD_TOKEN \
+            -r acc2ab8ea83e2adc72ea8c060fb8cdfb \
+            -b . \
+            -d ./embold-data \
+            -c ./repository-configuration.json \
+            -l ./embold-log \
+            -sh ./embold-scanner-home \
+            -v
