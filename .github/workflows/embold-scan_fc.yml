@@ -30,7 +30,11 @@ jobs:
 
       - name: Build with Maven (Skip Frontend and Tests)
         run: |
-          mvn -B clean install -DskipTests -Dfrontend.skip=true
+          mvn -B clean install \
+            -DskipTests=true \
+            -Dskip.npm=true \
+            -Dskip.yarn=true \
+            -Dskip.installnodenpm=true
 
       - name: Download and Extract Scanner
         run: |
