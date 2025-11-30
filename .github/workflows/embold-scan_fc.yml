@@ -53,7 +53,7 @@ jobs:
           EMBOLD_TOKEN=${{ secrets.EMBOLD_TOKEN_JAVA }} \
           ./browserstack-codequality-scanner/bin/embold-scanner analyse \
             -u ${{ vars.EMBOLD_URL_JAVA }} \
-            -t $EMBOLD_TOKEN \
+            -t ${{ secrets.EMBOLD_TOKEN_JAVA }} \
             -r acc2ab8ea83e2adc72ea8c060fb8cdfb \
             -b . \
             -d ./embold-data \
